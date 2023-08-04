@@ -14,25 +14,29 @@ import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Drawer, Input, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
-import {listMyinterfaceInfoByPageUsingPOST} from "@/services/api platform/interfaceInfoController";
+import {
+  addinterfaceInfoUsingPOST,
+  listMyinterfaceInfoByPageUsingPOST, updateinterfaceInfoUsingPOST
+} from "@/services/api platform/interfaceInfoController";
 import {SortOrder} from "antd/lib/table/interface";
+import CreateModal from "@/pages/InterfaceInfo/components/CreateModal";
+import UpdateModal from "@/pages/InterfaceInfo/components/UpdateModal";
 
 /**
  * @en-US Add node
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.RuleListItem) => {
+const handleAdd = async (fields: API.InterfaceInfo) => {
   const hide = message.loading('正在添加');
   try {
-    await addRule({ ...fields });
+    await addinterfaceInfoUsingPOST({ ...fields });
     hide();
-    message.success('Added successfully');
+    message.success('创建成功');
     return true;
   } catch (error) {
     hide();
-    message.error('Adding failed, please try again!');
+    message.error('创建失败，请重试');
     return false;
   }
 };
@@ -100,9 +104,24 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.InterfaceInfo>();
+  const [selectedRowsState, setSelectedRows] = useState<API.InterfaceInfo[]>([]);
 
+  const handleUpdate = async (fields: API.InterfaceInfo) => {
+    const hide = message.loading('修改中');
+    try {
+      await updateinterfaceInfoUsingPOST({
+        ...fields
+      });
+      hide();
+      message.success('更新接口信息成功');
+      return true;
+    } catch (error: any) {
+      hide();
+      message.error('更新接口信息失败' + error.message);
+      return false;
+    }
+  };
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
@@ -118,7 +137,14 @@ const TableList: React.FC = () => {
     {
       title: "接口名称",
       dataIndex: 'name',
-      valueType: 'text'
+      valueType: 'text',
+      formItemProps:{
+        rules:[{
+          required: true,
+          message: "写写吧球球了"
+        }
+        ]
+      }
     },
     {
       title: "接口描述",
@@ -168,11 +194,13 @@ const TableList: React.FC = () => {
       title: "创建时间",
       dataIndex: 'createTime',
       valueType: 'dateTime',
+      hideInForm: true
     },
     {
       title: "更新时间",
       dataIndex: 'updateTime',
       valueType: 'dateTime',
+      hideInForm: true
     },
     {
       title: '操作',
@@ -186,18 +214,19 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
+          <FormattedMessage id="pages.searchTable.config" defaultMessage="修改" />
         </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
-        </a>,
+        // <a key="subscribeAlert" href="https://procomponents.ant.design/">
+        //   <FormattedMessage
+        //     id="pages.searchTable.subscribeAlert"
+        //     defaultMessage="订阅警报"
+        //   />
+        // </a>,
       ],
     },
   ];
 
+  // @ts-ignore
   return (
     <PageContainer>
       <ProTable<API.RuleListItem, API.PageParams>
@@ -234,6 +263,12 @@ const TableList: React.FC = () => {
               data: res.data.records || [],
               success: true,
               total: res.data.total
+            }
+          }else {
+            return{
+              data: [],
+              success: false,
+              total: 0
             }
           }
         }}
@@ -318,7 +353,8 @@ const TableList: React.FC = () => {
         />
         <ProFormTextArea width="md" name="desc" />
       </ModalForm>
-      <UpdateForm
+      <UpdateModal
+        columns={columns}
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
           if (success) {
@@ -329,13 +365,13 @@ const TableList: React.FC = () => {
             }
           }
         }}
-        onCancel={() => {
+        onCancel={() =>  {
           handleUpdateModalOpen(false);
           if (!showDetail) {
             setCurrentRow(undefined);
           }
         }}
-        updateModalOpen={updateModalOpen}
+        visible = {updateModalOpen}
         values={currentRow || {}}
       />
 
@@ -362,6 +398,7 @@ const TableList: React.FC = () => {
           />
         )}
       </Drawer>
+      <CreateModal columns={columns} onCancel={()=>{handleModalOpen(false)}} onSubmit={(values)=>{handleAdd(values)}} visible={createModalOpen}/>
     </PageContainer>
   );
 };
