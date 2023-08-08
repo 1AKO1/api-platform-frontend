@@ -11,6 +11,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseInterfaceInfoVO_ = {
+    code?: number;
+    data?: InterfaceInfoVO;
+    message?: string;
+  };
+
   type BaseResponseLoginUserVO_ = {
     code?: number;
     data?: LoginUserVO;
@@ -20,6 +26,12 @@ declare namespace API {
   type BaseResponseLong_ = {
     code?: number;
     data?: number;
+    message?: string;
+  };
+
+  type BaseResponseObject_ = {
+    code?: number;
+    data?: Record<string, any>;
     message?: string;
   };
 
@@ -86,6 +98,11 @@ declare namespace API {
     id?: number;
   };
 
+  type getinterfaceInfoByIdUsingGETParams = {
+    /** id */
+    id: number;
+  };
+
   type getPostVOByIdUsingGETParams = {
     /** id */
     id?: number;
@@ -98,6 +115,10 @@ declare namespace API {
 
   type getUserVOByIdUsingGETParams = {
     /** id */
+    id?: number;
+  };
+
+  type IdRequest = {
     id?: number;
   };
 
@@ -116,6 +137,8 @@ declare namespace API {
     name?: string;
     /** 请求头 */
     requestHeader?: string;
+    /** 请求参数 */
+    requestParams?: string;
     /** 响应头 */
     responseHeader?: string;
     /** 接口状态（0-关闭，1-开启，2-异常） */
@@ -133,8 +156,18 @@ declare namespace API {
     method?: string;
     name?: string;
     requestHeader?: string;
+    requestParams?: string;
     responseHeader?: string;
     url?: string;
+  };
+
+  type InterfaceInfoInvokeRequest = {
+    current?: number;
+    id?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    userRequestParams?: string;
   };
 
   type InterfaceInfoQueryRequest = {
@@ -145,6 +178,7 @@ declare namespace API {
     name?: string;
     pageSize?: number;
     requestHeader?: string;
+    requestParams?: string;
     responseHeader?: string;
     sortField?: string;
     sortOrder?: string;
@@ -161,10 +195,36 @@ declare namespace API {
     name?: string;
     pageSize?: number;
     requestHeader?: string;
+    requestParams?: string;
     responseHeader?: string;
     sortField?: string;
     sortOrder?: string;
     status?: number;
+    url?: string;
+  };
+
+  type InterfaceInfoVO = {
+    /** 创建时间 */
+    createTime?: string;
+    /** 描述 */
+    description?: string;
+    /** 主键 */
+    id?: number;
+    /** 请求类型 */
+    method?: string;
+    /** 名称 */
+    name?: string;
+    /** 请求头 */
+    requestHeader?: string;
+    /** 请求参数 */
+    requestParams?: string;
+    /** 响应头 */
+    responseHeader?: string;
+    /** 接口状态（0-关闭，1-开启，2-异常） */
+    status?: number;
+    /** 更新时间 */
+    updateTime?: string;
+    /** 接口地址 */
     url?: string;
   };
 
@@ -308,17 +368,16 @@ declare namespace API {
   };
 
   type User = {
+    accessKey?: string;
     createTime?: string;
     id?: number;
     isDelete?: number;
-    mpOpenId?: string;
-    unionId?: string;
+    secretKey?: string;
     updateTime?: string;
     userAccount?: string;
     userAvatar?: string;
     userName?: string;
     userPassword?: string;
-    userProfile?: string;
     userRole?: string;
   };
 

@@ -19,6 +19,7 @@ const UpdateModal: React.FC<Props> = (props) => {
 
   const formRef = useRef<ProFormInstance>();
 
+  // 监听变量
   useEffect(() => {
     if(formRef){
       formRef.current?.setFieldsValue(values)
@@ -27,14 +28,15 @@ const UpdateModal: React.FC<Props> = (props) => {
   }, [values])
 
   return (
-    <Modal visible={visible} onCancel={() => onCancel?.()}>
+    <Modal visible={visible} footer={null} onCancel={() => onCancel?.()}>
       <ProTable
         type="form"
         columns={columns}
         formRef={formRef}
         onSubmit={async (value) => {
-          console.log(formRef.current)
-          // onSubmit?.(value)
+          console.log(formRef.current?.getFieldsValue())
+          console.log(value)
+          onSubmit?.(value)
         }
       }/>
     </Modal>
